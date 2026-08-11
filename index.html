@@ -7,7 +7,6 @@
 <link rel="preload" href="fonts/serifsc.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cormorant.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-/* 独立字体文件异步加载(font-display:swap 先用系统字兜底,到了再平滑替换) */
 @font-face{font-family:'Noto Serif SC';font-weight:400 900;font-display:swap;
   src:url(fonts/serifsc.woff2) format('woff2');}
 @font-face{font-family:'Noto Sans SC';font-weight:300 500;font-display:swap;
@@ -1672,10 +1671,42 @@ document.getElementById('btnRequiz').onclick=()=>{
 };
 
 function scaleStage(){
-  const s=Math.min(window.innerWidth/W,window.innerHeight/H);
-  document.getElementById('stage').style.transform=`scale(${s})`;
+  const iw=window.innerWidth, ih=window.innerHeight;
+  const stage=document.getElementById('stage');
+  const vp=document.getElementById('scrMap');
+  // 竖屏窄屏(手机):按宽度铺满,顶部对齐,可上下滑动看全图。
+  // ——4:3 横向地图在竖屏取 min 会缩到中间一小条、四周留白;改为铺满宽度。
+  // transform:scale 不改变布局盒尺寸,故用负 margin 把布局高度收缩到视觉高度,
+  // 让父层 overflow-y 的滚动区正好等于地图实际高度(否则会滚出一片空白)。
+  const portraitPhone = ih>iw && iw<820;
+  if(portraitPhone){
+    const s=iw/W;                        // 铺满宽度(不横向溢出)
+    const scaledH=Math.round(H*s);
+    // 用 block 布局 + 顶部对齐:transform 不改布局盒,故显式把 viewport 内容高度
+    // 设为视觉高度(padding-bottom 撑出可滚区),再据此决定是否需要滚动/垂直居中。
+    stage.style.transformOrigin='top left';
+    stage.style.transform=`scale(${s})`;
+    stage.style.marginLeft='0'; stage.style.marginBottom='0';
+    if(vp){
+      vp.style.display='block';
+      vp.style.overflowX='hidden'; vp.style.webkitOverflowScrolling='touch';
+      vp.style.overflowY = scaledH>ih ? 'auto' : 'hidden';
+      // 图比屏矮时上下留白平分,让地图垂直居中;否则贴顶可下滑
+      const padTop = scaledH<ih ? Math.round((ih-scaledH)/2) : 0;
+      vp.style.paddingTop = padTop+'px';
+      // 让滚动内容高度=视觉高度:给 stage 之后垫一个等高占位(用 stage 自身的 margin-bottom 收缩)
+      stage.style.marginBottom = Math.round(-(H-scaledH))+'px';
+    }
+  }else{
+    const s=Math.min(iw/W, ih/H);
+    stage.style.transformOrigin='center center';
+    stage.style.transform=`scale(${s})`;
+    stage.style.marginLeft='0'; stage.style.marginBottom='0';
+    if(vp){vp.style.display='flex'; vp.style.paddingTop='0'; vp.style.alignItems='center'; vp.style.overflowY='hidden'; vp.style.overflowX='hidden';}
+  }
 }
 window.addEventListener('resize',scaleStage);
+window.addEventListener('orientationchange',()=>setTimeout(scaleStage,120));
 
 /* ============================================================
    BOOT · 状态机入口
