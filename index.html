@@ -396,11 +396,48 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
 .congrats{position:absolute;inset:0;z-index:90;background:rgba(42,58,92,.92);display:none;flex-direction:column;
   align-items:center;justify-content:center;color:var(--paper);text-align:center}
 .congrats.on{display:flex}
-/* B4 合章书页:竖版藏书票/邮票 */
+/* 十秒水彩画电影 */
+.film{position:absolute;inset:0;z-index:2;overflow:hidden;background:#0d1220;display:none}
+.congrats.filming .film{display:block}
+.congrats.filming .stamp-card,.congrats.filming #congratsActions{display:none}
+.film-stage{position:absolute;inset:0}
+.film-frame{position:absolute;inset:0;opacity:0;background-size:cover;background-position:center;
+  will-change:transform,opacity;filter:saturate(1.28) contrast(.86) brightness(1.05)}
+/* 水彩铺色:纸纹叠色相乘,让照片像被水彩笔晕染过 */
+.film-frame::before{content:"";position:absolute;inset:0;mix-blend-mode:soft-light;opacity:.72;
+  background:
+    radial-gradient(60% 45% at 30% 25%,rgba(199,154,75,.6),transparent 70%),
+    radial-gradient(55% 50% at 75% 70%,rgba(197,90,74,.5),transparent 72%),
+    radial-gradient(70% 60% at 50% 100%,rgba(42,58,92,.6),transparent 70%),
+    radial-gradient(50% 40% at 80% 15%,rgba(120,150,120,.5),transparent 70%)}
+/* 纸张水彩纹理:斑驳留白 + 湿边沉积,营造宣纸晕染 */
+.film-frame::after{content:"";position:absolute;inset:0;mix-blend-mode:overlay;opacity:.5;
+  background:
+    radial-gradient(140px 100px at 18% 28%,rgba(255,255,255,.75),transparent 60%),
+    radial-gradient(180px 130px at 68% 58%,rgba(255,255,255,.6),transparent 62%),
+    radial-gradient(110px 80px at 45% 82%,rgba(0,0,0,.28),transparent 60%),
+    radial-gradient(90px 70px at 88% 30%,rgba(255,255,255,.55),transparent 60%),
+    repeating-linear-gradient(58deg,rgba(0,0,0,.05) 0 2px,transparent 2px 6px)}
+.film-frame.show{opacity:1}
+.film-wc{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.film-grain{position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+  background-image:radial-gradient(rgba(255,255,255,.16) 1px,transparent 1px);background-size:3px 3px}
+.film-cap{position:absolute;left:0;right:0;bottom:11%;text-align:center;color:var(--paper);
+  font-family:var(--f-serif);font-size:27px;letter-spacing:5px;font-weight:600;
+  opacity:0;transform:translateY(14px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.16,1,.3,1);padding:0 8%}
+.film-cap span{display:inline-block;padding:9px 26px;background:rgba(13,18,32,.42);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border-radius:3px;
+  box-shadow:0 4px 24px rgba(13,18,32,.5);text-shadow:0 1px 8px rgba(13,18,32,.9)}
+.film-cap.show{opacity:1;transform:translateY(0)}
+.film-skip{position:absolute;right:22px;bottom:20px;padding:7px 15px;font-family:var(--f-sans);font-size:12px;
+  letter-spacing:2px;color:rgba(247,241,227,.7);background:rgba(13,18,32,.35);border:1px solid rgba(247,241,227,.28);
+  border-radius:20px;cursor:pointer;transition:.2s;z-index:5}
+.film-skip:hover{color:var(--paper);border-color:var(--paper);background:rgba(13,18,32,.6)}
+/* B4 合章书页:竖版藏书票/邮票(电影落幕后) */
 .stamp-card{width:392px;background:var(--paper);color:var(--navy);position:relative;
   padding:0;box-shadow:0 18px 60px rgba(0,0,0,.4);
   transform:scale(.86) translateY(16px);opacity:0;transition:.55s cubic-bezier(.16,1,.3,1)}
-.congrats.on .stamp-card{transform:scale(1) translateY(0);opacity:1}
+.congrats.on:not(.filming) .stamp-card{transform:scale(1) translateY(0);opacity:1}
 .stamp-card svg{display:block;width:100%;height:auto}
 .congrats-actions{margin-top:28px;display:flex;gap:14px}
 .congrats-actions button{padding:13px 30px;font-family:var(--f-serif);font-size:16px;letter-spacing:2px;
@@ -439,13 +476,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
      ============================================================ -->
 <div class="screen" id="scrProfile">
   <div class="prof-wrap" id="profWrap"><!-- 由 JS 注入 --></div>
-</div>
-
-<!-- ============================================================
-     屏 2.5:确定性约束(审美定了方向,这些定了它的形状)
-     ============================================================ -->
-<div class="screen" id="scrConst">
-  <div class="cons-wrap" id="consWrap"><!-- 由 JS 注入 --></div>
 </div>
 
 <!-- ============================================================
@@ -494,10 +524,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
     </div>
 
     <div class="congrats" id="congrats">
+      <!-- 十秒水彩画电影:景点幻灯 + 水彩晕染遮罩 + 逐句签名 -->
+      <div class="film" id="film">
+        <div class="film-stage" id="filmStage"></div>
+        <svg class="film-wc" id="filmWC" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <filter id="wcedge"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="3" seed="7" result="n"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="7"/></filter>
+            <radialGradient id="wcvig" cx="50%" cy="46%" r="72%">
+              <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="72%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#0d1220" stop-opacity="0.5"/></radialGradient>
+          </defs>
+          <rect x="-4" y="-4" width="108" height="108" fill="url(#wcvig)"/>
+        </svg>
+        <div class="film-grain"></div>
+        <div class="film-cap" id="filmCap"></div>
+        <button class="film-skip" id="filmSkip">跳过 ⏭</button>
+      </div>
+      <!-- 电影落幕后的收束卡(可保存) -->
       <div class="stamp-card" id="stampCard"></div>
-      <div class="congrats-actions">
+      <div class="congrats-actions" id="congratsActions">
         <button id="btnSaveStamp" class="gold">保存这张书页</button>
-        <button onclick="document.getElementById('congrats').classList.remove('on')">合上书</button>
+        <button onclick="closeCongrats()">合上书</button>
       </div>
     </div>
   </div>
@@ -807,96 +856,23 @@ function showProfile(profile){
     ${soften}
     <button class="prof-cta" id="ctaGo">为你铺开这段路 →</button>`;
   document.getElementById('ctaGo').onclick=()=>{
-    showConstraints(profile);
-  };
-  goto('profile');
-  setTimeout(()=>wrap.classList.add('reveal'),120);
-}
-
-/* ============================================================
-   PART D.5 · 确定性约束收集屏(审美定了方向,这些定了它的形状)
-   四项:天数 / 起降机场 / 出行月份 / 同行结构
-   ============================================================ */
-const CONS_FIELDS=[
-  {key:'days', label:'你有多少天', opts:[
-    {v:5, main:'4–6 天', note:'一条主线,走一片'},
-    {v:8, main:'7–9 天', note:'从容,能住下来'},
-    {v:11,main:'10–12 天',note:'深走,每站放慢'},
-    {v:14,main:'12 天以上',note:'把路走透,不赶'},
-  ]},
-  {key:'airport', label:'从哪座机场进出', opts:[
-    {v:'URC',main:'乌鲁木齐 URC',note:'直达北疆草原、湖泊'},
-    {v:'KHG',main:'喀什 KHG',note:'直达南疆古城、帕米尔'},
-    {v:'KCA',main:'库车 KCA',note:'直达塔克拉玛干腹地'},
-  ]},
-  {key:'month', label:'什么时候出发', opts:[
-    {v:4, main:'4–5 月',note:'春回,草木初醒'},
-    {v:7, main:'6–8 月',note:'盛夏,湖山最盛'},
-    {v:9, main:'9–10 月',note:'金秋,胡杨与雪山'},
-    {v:1, main:'11–3 月',note:'冬旷,人少天净'},
-  ]},
-  {key:'party', label:'和谁一起', opts:[
-    {v:'solo',  main:'独行',   note:'只对自己负责'},
-    {v:'couple',main:'两个人', note:'刚好的距离'},
-    {v:'family',main:'带娃',   note:'节奏要缓一些'},
-    {v:'friends',main:'朋友团',note:'热闹，能折腾'},
-  ]},
-];
-const PARTY_TXT={solo:'独行',couple:'两个人',family:'带娃出行',friends:'一群朋友'};
-function showConstraints(profile){
-  const pick={};   // 收集当前选择
-  const wrap=document.getElementById('consWrap');
-  wrap.classList.remove('reveal');
-  wrap.innerHTML=`
-    <div class="c-kicker">审美定了方向 · 这些定了它的形状</div>
-    <div class="c-title">再落实几件事</div>
-    <div class="c-sub">客观的事一旦定了,路就照它来铺——审美只在能抵达的范围里,替你挑最合意的那条。</div>
-    <div class="cons-fields">
-      ${CONS_FIELDS.map(f=>`
-        <div class="cons-field">
-          <span class="cf-label">${f.label}</span>
-          <div class="cf-opts" data-key="${f.key}">
-            ${f.opts.map(o=>`<div class="cf-opt" data-v="${o.v}">
-              <div class="cf-main">${o.main}</div><div class="cf-note">${o.note}</div></div>`).join('')}
-          </div>
-        </div>`).join('')}
-    </div>
-    <button class="cons-cta" id="consGo">铺开这段路 →</button>
-    <button class="cons-skip" id="consSkip">先不填，直接按审美出发 →</button>`;
-  // 选择交互:同组单选
-  wrap.querySelectorAll('.cf-opts').forEach(grp=>{
-    const key=grp.dataset.key;
-    grp.querySelectorAll('.cf-opt').forEach(opt=>{
-      opt.onclick=()=>{
-        grp.querySelectorAll('.cf-opt').forEach(o=>o.classList.remove('sel'));
-        opt.classList.add('sel');
-        const raw=opt.dataset.v;
-        pick[key]=(key==='days'||key==='month')?+raw:raw;
-        if(Object.keys(pick).length===CONS_FIELDS.length)
-          document.getElementById('consGo').classList.add('ready');
-      };
-    });
-  });
-  document.getElementById('consGo').onclick=()=>{
-    if(Object.keys(pick).length<CONS_FIELDS.length)return;
-    saveConstraints(pick);
-    const res=resolveRoute(profile,pick);
-    const shaped=applyConstraints(res.route,pick);
-    shaped._compromised=res.compromised; shaped._yielded=res.yielded; shaped._note=res.note;
-    saveChosen(shaped.id);
-    enterMap(shaped,profile);
-  };
-  // 跳过:不收集约束,纯按审美匹配(清掉旧约束,回到纯审美驱动)
-  document.getElementById('consSkip').onclick=()=>{
+    // 审美定了就直接铺路:纯按六轴匹配最合意的路线进地图(不再收集客观约束)
     constraints=null;
     try{localStorage.removeItem(KEY_CONS)}catch(e){}
     const r=matchRoute(profile);
     saveChosen(r.id);
     enterMap(r,profile);
   };
-  goto('const');
+  goto('profile');
   setTimeout(()=>wrap.classList.add('reveal'),120);
 }
+
+/* ============================================================
+   PART D.5 · (已移除)确定性约束收集屏
+   审美选完直接铺路 → 纯六轴匹配进地图。
+   PARTY_TXT 保留:回访态旧约束仍可能用于地图标题展示。
+   ============================================================ */
+const PARTY_TXT={solo:'独行',couple:'两个人',family:'带娃出行',friends:'一群朋友'};
 
 /* ============================================================
    PART E · 三屏切换 + 持久化
@@ -952,6 +928,78 @@ function chime(){
     o.start(t0);o.stop(t0+0.34);
   });
 }
+
+/* ---------- 冥想背景音景(WebAudio 合成,循环 · 受 soundOn 控制) ----------
+   两支微失谐 drone(根音+五度)经低通 + 缓慢 LFO 起伏,叠一层极轻的高频泛音;
+   另有一个定时器,每隔 6~11 秒随机点一颗五声音阶的「风铃」音,空灵不喧宾夺主。 */
+let _amb=null;         // {nodes..., timer}
+const AMB_ROOT=146.83; // D3
+function startAmbience(){
+  if(_amb)return;                       // 已在播
+  const ctx=audioCtx();if(!ctx)return;
+  const now=ctx.currentTime;
+  const master=ctx.createGain();
+  master.gain.setValueAtTime(0,now);
+  master.gain.linearRampToValueAtTime(0.16,now+3.5);   // 渐入,不惊扰
+  const lp=ctx.createBiquadFilter();
+  lp.type='lowpass';lp.frequency.value=620;lp.Q.value=0.6;
+  master.connect(lp).connect(ctx.destination);
+  // 缓慢起伏的 LFO 调制总音量(呼吸感)
+  const lfo=ctx.createOscillator(),lfoG=ctx.createGain();
+  lfo.frequency.value=0.06;lfoG.gain.value=0.05;
+  lfo.connect(lfoG).connect(master.gain);lfo.start(now);
+  // drone:根音 + 上方五度,各配一支微失谐副本
+  const drones=[];
+  [[AMB_ROOT,0.5],[AMB_ROOT*1.5,0.34],[AMB_ROOT*2,0.12]].forEach(([f,g])=>{
+    [-0.3,0.3].forEach(det=>{
+      const o=ctx.createOscillator(),a=ctx.createGain();
+      o.type='sine';o.frequency.value=f;o.detune.value=det*7;
+      a.gain.value=g*0.5;
+      o.connect(a).connect(master);o.start(now);
+      drones.push(o);
+    });
+  });
+  // 风铃点音:五声音阶(D 宫),随机间隔,极轻
+  const PENTA=[587.33,659.25,783.99,880.00,1046.50]; // D5 E5 G5 A5 C6
+  const bell=()=>{
+    if(!_amb)return;
+    const c=audioCtx();if(!c){return;}
+    if(soundOn){
+      const f=PENTA[Math.floor((Math.abs(Math.sin(c.currentTime*12.9898))*43758.5453)%1*PENTA.length)]||PENTA[0];
+      const t0=c.currentTime;
+      const o=c.createOscillator(),a=c.createGain();
+      o.type='sine';o.frequency.value=f;
+      a.gain.setValueAtTime(0,t0);
+      a.gain.linearRampToValueAtTime(0.06,t0+0.02);
+      a.gain.exponentialRampToValueAtTime(0.0001,t0+2.6);
+      o.connect(a).connect(lp);
+      o.start(t0);o.stop(t0+2.7);
+    }
+    const gap=6000+(Math.abs(Math.sin(c.currentTime*7.13))*5000); // 6~11s
+    _amb.timer=setTimeout(bell,gap);
+  };
+  _amb={master,lp,lfo,drones,timer:null};
+  _amb.timer=setTimeout(bell,4000);
+}
+function stopAmbience(){
+  if(!_amb)return;
+  const ctx=_actx;
+  const a=_amb;_amb=null;                // 先置空,阻止 bell 续接
+  clearTimeout(a.timer);
+  if(ctx){
+    const now=ctx.currentTime;
+    try{a.master.gain.cancelScheduledValues(now);
+      a.master.gain.setValueAtTime(a.master.gain.value,now);
+      a.master.gain.linearRampToValueAtTime(0.0001,now+1.2);}catch(e){}
+    setTimeout(()=>{try{a.drones.forEach(o=>o.stop());a.lfo.stop();}catch(e){}},1400);
+  }
+}
+// 依 soundOn + 是否在地图屏,决定音景开关
+function syncAmbience(){
+  if(soundOn && mapBooted) startAmbience();
+  else stopAmbience();
+}
+
 function syncSoundBtn(){
   const b=document.getElementById('sndToggle');if(!b)return;
   b.textContent=soundOn?'🔔':'🔕';
@@ -963,13 +1011,13 @@ let mapBooted=false;
 function goto(screen){
   document.getElementById('scrQuiz').classList.toggle('on',screen==='quiz');
   document.getElementById('scrProfile').classList.toggle('on',screen==='profile');
-  document.getElementById('scrConst').classList.toggle('on',screen==='const');
   // 地图屏是 z-1 常驻,不需要 .on;进入时确保已 boot
 }
 function enterMap(route,profile){
   loadRoute(route,profile);
   goto('map');
   if(!mapBooted){scaleStage();mapBooted=true;}
+  syncAmbience();   // 进地图:若音效已开,起冥想背景音景
   // 首次进图:若有天数裁剪/就近降级说明,用一次性信笺告知(仅当本路线还没打过卡)
   const virgin=state && Object.keys(state.arrived||{}).length===0;
   if(virgin){
@@ -1998,11 +2046,92 @@ function buildStampCardSVG(){
 </svg>`;
   return svg;
 }
+// 十秒水彩画电影:走过的景点照片做 Ken Burns 幻灯 → 落幕到合章书页
+let _filmTimers=[],_filmPlaying=false;
 function showCongrats(){
   const holder=document.getElementById('stampCard');
   if(holder)holder.innerHTML=buildStampCardSVG();
-  document.getElementById('congrats').classList.add('on');
+  const con=document.getElementById('congrats');
+  con.classList.add('on');
+  playFilm(()=>{
+    con.classList.remove('filming');
+    chime();
+  });
+}
+function playFilm(done){
+  clearFilmTimers();
+  const con=document.getElementById('congrats');
+  const stage=document.getElementById('filmStage');
+  const cap=document.getElementById('filmCap');
+  const skip=document.getElementById('filmSkip');
+  // 走过的景点(有配图的)按到达顺序
+  const shots=ROUTE.filter(id=>state.arrived[id])
+    .map(id=>PINS.find(p=>p.id===id)).filter(p=>p&&p.img);
+  if(!shots.length){ // 没有配图则跳过电影,直接书页
+    con.classList.remove('filming'); if(done)done(); return;
+  }
+  con.classList.add('filming');
+  _filmPlaying=true;
   chime();
+  const N=shots.length;
+  const TOTAL=10000;                       // 约 10 秒
+  const per=Math.max(1500,Math.round(TOTAL/N));
+  stage.innerHTML='';
+  const frames=shots.map((p,i)=>{
+    const f=document.createElement('div');
+    f.className='film-frame';
+    f.style.backgroundImage=`url(images/${p.img})`;
+    // 交替 Ken Burns 运镜方向
+    const zoomIn=i%2===0;
+    f.style.transform=zoomIn?'scale(1.02)':'scale(1.14)';
+    f.style.transition=`opacity 1.2s ease, transform ${(per+1400)/1000}s ease-out`;
+    stage.appendChild(f);
+    return {el:f,zoomIn,pin:p};
+  });
+  const capFor=i=>{
+    // 首、中、末给旁白,其余用景点名,形成"山河为序…景点…这一程值得"的节奏
+    if(i===0) return '山河为序';
+    if(i===N-1) return '这一程,值得';
+    return shots[i].nm;
+  };
+  let idx=0;
+  const showFrame=i=>{
+    frames.forEach((fr,k)=>{ if(k!==i) fr.el.classList.remove('show'); });
+    const fr=frames[i];
+    fr.el.classList.add('show');
+    // 触发运镜(下一帧位)
+    requestAnimationFrame(()=>{ fr.el.style.transform=fr.zoomIn?'scale(1.16)':'scale(1.0)'; });
+    cap.classList.remove('show');
+    _filmTimers.push(setTimeout(()=>{
+      cap.innerHTML='<span>'+capFor(i).replace(/[<>&]/g,'')+'</span>';
+      cap.classList.add('show');
+    },260));
+  };
+  const step=()=>{
+    if(!_filmPlaying) return;
+    if(idx>=N){ endFilm(done); return; }
+    showFrame(idx);
+    idx++;
+    _filmTimers.push(setTimeout(step,per));
+  };
+  step();
+  skip.onclick=()=>endFilm(done);
+}
+function endFilm(done){
+  clearFilmTimers();
+  _filmPlaying=false;
+  const con=document.getElementById('congrats');
+  const cap=document.getElementById('filmCap');
+  cap.classList.remove('show');
+  // 末帧淡出 → 揭示书页
+  con.classList.remove('filming');
+  if(done)done();
+}
+function clearFilmTimers(){_filmTimers.forEach(t=>clearTimeout(t));_filmTimers=[];}
+function closeCongrats(){
+  clearFilmTimers();_filmPlaying=false;
+  const con=document.getElementById('congrats');
+  con.classList.remove('on');con.classList.remove('filming');
 }
 // 保存:优先 PNG(离屏 canvas);失败兜底 SVG 下载
 function downloadStamp(){
@@ -2129,6 +2258,7 @@ document.getElementById('btnReplay').onclick=replay;
     try{localStorage.setItem(KEY_SOUND,soundOn?'1':'0')}catch(e){}
     syncSoundBtn();
     if(soundOn){audioCtx();ding();}   // 开启时给一声反馈
+    syncAmbience();                    // 开→起冥想音景;关→淡出停止
   };}
   const sv=document.getElementById('btnSaveStamp');
   if(sv)sv.onclick=downloadStamp;
