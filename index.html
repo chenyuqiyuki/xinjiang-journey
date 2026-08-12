@@ -354,10 +354,35 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
 .card .sec p{font-size:15px;line-height:1.9;color:var(--navy)}
 .card .note{font-family:var(--f-orn);font-style:italic;font-size:19px;line-height:1.6;color:var(--navy-soft);
   border-left:3px solid var(--gold);padding-left:16px}
-.card .booking a{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border:1px solid var(--navy);
-  margin-bottom:8px;text-decoration:none;color:var(--navy);font-size:14px;background:var(--paper-2);transition:.2s}
-.card .booking a:hover{background:var(--gold-soft)}
-.card .booking a .price{font-family:var(--f-serif);font-weight:600;color:var(--gold)}
+/* 顶部配图(卡片内,圆角细描边) */
+.card-photo{position:relative;width:100%;height:210px;margin-bottom:22px;border:1.5px solid var(--navy);
+  border-radius:10px;overflow:hidden;background:var(--paper-2)}
+.card-photo img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(1.02) contrast(1.02);transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.card-photo:hover img{transform:scale(1.04)}
+.card-photo .photo-cap{position:absolute;left:0;right:0;bottom:0;padding:22px 16px 10px;
+  font-family:var(--f-serif);font-weight:700;font-size:17px;letter-spacing:1px;color:#fff;
+  background:linear-gradient(to top,rgba(20,28,48,.72),transparent)}
+/* 氛围渐变兜底(无图或加载失败),按点位类型着色 */
+.card-photo.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.card-photo.placeholder img{display:none}
+.card-photo.placeholder .ph-emoji{font-size:54px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
+.card-photo.placeholder .photo-cap{background:linear-gradient(to top,rgba(20,28,48,.35),transparent)}
+.card-photo.ph-culture{background:linear-gradient(135deg,#c98a3c,#8a5a24)}
+.card-photo.ph-sight{background:linear-gradient(135deg,#4a7fa5,#2a4a6c)}
+.card-photo.ph-transit{background:linear-gradient(135deg,#8a94a8,#4a5570)}
+/* 「这个地点,值得——」手风琴 */
+.card .worth .worth-list{display:flex;flex-direction:column;gap:9px}
+.worth-item{border:1px solid var(--navy);border-radius:8px;overflow:hidden;background:var(--paper-2);transition:.2s}
+.worth-item:hover{background:var(--gold-soft)}
+.worth-item.open{background:var(--paper);box-shadow:3px 3px 0 var(--navy)}
+.worth-t{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:13px 15px;background:none;border:none;cursor:pointer;text-align:left}
+.worth-tx{font-family:var(--f-serif);font-weight:700;font-size:15.5px;line-height:1.5;color:var(--navy)}
+.worth-cv{flex:none;font-size:18px;color:var(--gold);transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.worth-item.open .worth-cv{transform:rotate(180deg)}
+.worth-d{max-height:0;overflow:hidden;transition:max-height .38s cubic-bezier(.16,1,.3,1)}
+.worth-d p{font-size:14px;line-height:1.85;color:var(--navy-soft);padding:0 16px 14px}
 .card .actions{display:flex;gap:12px;padding:20px 30px;border-top:1.5px solid var(--navy);background:var(--paper-2)}
 .card .actions button{flex:1;padding:13px;font-family:var(--f-serif);font-weight:600;font-size:16px;letter-spacing:2px;
   cursor:pointer;border:1.5px solid var(--navy);background:var(--paper);color:var(--navy);transition:.2s}
@@ -974,29 +999,56 @@ const ROUTES=[
     optional:['yengisar','yecheng'],  // 天数不足时可裁:英吉沙(半日)、叶城(半日中转)
     pins:[
       {id:'kashgar',nm:'喀什古城',en:'Kashgar Old Town',icon:'🕌',type:'culture',day:'DAY 1',lng:75.99,lat:39.47,lblDir:'right',
+        img:'kashgar.jpg',
         note:'活着的千年老城。土黄的巷弄在午后逆光里发烫,铜匠的敲击声就是这座城的心跳。',
         quote:'土黄墙在逆光里发烫,铜匠的敲击是这座城的脉搏。美不在纪念碑,在日常的手上。',
         plan:'艾提尕尔 · 老城迷巷 · 铜器手作',dur:'1.5 日',
+        worth:[
+          {t:'在午后逆光里,走一条没有目的的巷',d:'不必看攻略。让土黄的墙替你把光筛成金,拐过一个又一个弯——迷路,才是老城给旅人的第一份礼物。'},
+          {t:'坐进一家铜器铺,听一段城的心跳',d:'铜匠的锤子几百年没停过。那不是噪音,是这座城活着的证据——你会忽然懂了,美原来可以是一门手艺。'},
+          {t:'赶一次真正的巴扎,而非景点',d:'烤包子的烟、艾德莱斯的红、维吾尔语的招呼声……在这里,繁华不是被参观的,是被过日子过出来的。'},
+          {t:'在艾提尕尔的黄昏,坐下来,什么都不做',d:'鸽群起落,唤礼声起。让一天最松弛的半小时,替你把旅途的紧绷慢慢卸下来。'}],
         booking:[bk('古城内民宿(比价)','¥420/晚','https://hotels.ctrip.com'),bk('高台民居导览','免费/打赏')]},
       {id:'yengisar',nm:'英吉沙',en:'Yengisar',icon:'🔪',type:'culture',day:'DAY 2',lng:76.17,lat:38.93,lblDir:'right',
+        img:'yengisar.jpg',
         note:'小刀之乡。一把刀从铁到纹要经几十道手,匠人低头的姿势几百年没变过。',
         quote:'一把刀要经几十道手。匠人低头的样子,几百年没变——这是时间打的结。',
         plan:'制刀作坊 · 巴扎闲逛',dur:'半日',
+        worth:[
+          {t:'看一把刀,如何从一块铁长出花纹',d:'淬火、锻打、镶嵌、开刃……几十道工序里没有一步能偷懒。你看的不是刀,是耐心本身。'},
+          {t:'和一位低头的匠人,静静坐一会儿',d:'他不会为你表演。几百年不变的那个低头的姿势,本身就是一句关于专注的箴言。'},
+          {t:'在小城的巴扎里,买一件带手温的物',d:'不为收藏,只为记得:这世上还有东西,是一双手慢慢做出来、而非机器吐出来的。'}],
         booking:[bk('英吉沙小刀工坊探访','免费'),bk('县城客栈','¥180/晚')]},
       {id:'shache',nm:'莎车',en:'Yarkand',icon:'🎶',type:'culture',day:'DAY 3',lng:77.24,lat:38.42,lblDir:'top',
+        img:'shache.jpg',
         note:'叶尔羌汗国故地,十二木卡姆的源头。老茶馆里,琴声一起,时间就慢下来。',
         quote:'十二木卡姆在老茶馆里醒来。琴声一起,时间就自己慢了下来,不必你催。',
         plan:'王陵 · 木卡姆茶馆 · 老巴扎',dur:'1 日',
+        worth:[
+          {t:'在老茶馆,让一段木卡姆漫过你',d:'不必懂词。热瓦普一响,几百年前的宫廷雅乐就活了过来——你只需要一杯茶,和一下午的空。'},
+          {t:'走进叶尔羌王陵,读一段被遗忘的辉煌',d:'这里曾是一个汗国的中心。残存的琉璃与碑文提醒你:再盛大的王朝,最后也只留下几句余音。'},
+          {t:'在老巴扎,认领一种慢下来的节奏',d:'这里的人不急着卖,你也不必急着买。慢,是这座城送给每个过客的隐形纪念品。'}],
         booking:[bk('莎车老城民宿','¥260/晚'),bk('木卡姆展演','¥60')]},
       {id:'yecheng',nm:'叶城',en:'Yecheng',icon:'⛰',type:'transit',day:'DAY 4',lng:77.42,lat:37.87,lblDir:'right',
+        img:'yecheng.jpg',
         note:'新藏线零公里,昆仑北门。这里是路的尽头,也是另一种辽阔的开始。',
         quote:'零公里碑立在昆仑脚下。路的尽头不是终点,是另一种辽阔递给你的开场白。',
         plan:'零公里碑 · 昆仑远望',dur:'半日',
+        worth:[
+          {t:'在新藏线零公里碑前,站一会儿',d:'向北是人间烟火,向南是雪线与无人区。你不必真的翻越昆仑——只是站在这里,就已经触到了辽阔的边缘。'},
+          {t:'远望一次昆仑,把人放回它该有的尺寸',d:'雪峰不动声色地压在天边。在它面前,人间的那些计较,会自己安静地缩小下去。'},
+          {t:'给旅途留一个"过渡"的停顿',d:'这里是人文与苍茫的交界。别急着赶路——让一段半日的空白,替你把两种辽阔轻轻缝在一起。'}],
         booking:[bk('叶城县城酒店','¥220/晚')]},
       {id:'hotan',nm:'和田',en:'Hotan',icon:'🧶',type:'culture',day:'DAY 5',lng:79.92,lat:37.11,lblDir:'top',
+        img:'hotan.jpg',
         note:'玉与丝的古城。艾德莱斯绸在织机上流成河,团城的巴扎里,烟火气浓得化不开。',
         quote:'艾德莱斯绸在织机上流成一条河。玉在水里等了千年——这座城把繁华织进了日常。',
         plan:'团城 · 艾德莱斯作坊 · 玉龙喀什河',dur:'1.5 日',
+        worth:[
+          {t:'看艾德莱斯绸,如何在织机上流成河',d:'扎染、上机、飞梭……那些流动的色块不是印上去的,是一寸寸织出来的。绸子里藏着的,是一种把繁华过成日常的本事。'},
+          {t:'去玉龙喀什河边,弯腰找一块自己的玉',d:'不为值钱。只为体会那种"玉在水里等了千年"的耐心——有些美,是要用膝盖和手,慢慢从河床里请出来的。'},
+          {t:'在团城的巷子里,被烟火气彻底淹没',d:'圆形的老城像一枚指纹。烤肉香、织机声、孩子的追逐……这里的繁华浓得化不开,也真实得不容你旁观。'},
+          {t:'以一座"活着的古城",给旅途收尾',d:'走过匠人、走过王陵、走过昆仑,最后回到最热气腾腾的日常里——原来一路追的美,一直都在有人认真过的日子里。'}],
         booking:[bk('和田市区酒店','¥320/晚'),bk('丝绸作坊体验','¥80/人')]},
     ],
     route:['kashgar','yengisar','shache','yecheng','hotan'],
@@ -1028,29 +1080,56 @@ const ROUTES=[
     optional:['muztagh','baishahu'],  // 可裁:慕士塔格远观(半日)、白沙湖(半日);卡拉库里/塔县为骨架不裁
     pins:[
       {id:'kashgar',nm:'喀什',en:'Kashgar',icon:'🕌',type:'transit',day:'DAY 1',lng:75.99,lat:39.47,lblDir:'right',
+        img:'kashgar.jpg',
         note:'出发点。补给、深呼吸,然后一路向上——海拔会替你把心也抬高。',
         quote:'从这里往上走。海拔一点点抬高,城声会慢慢退去,只剩风。',
         plan:'补给 · 老城告别 · 启程上高原',dur:'半日',
+        worth:[
+          {t:'在上高原前,好好和人间道个别',d:'喀什是这条路上最后一座热闹的城。逛一次老城、吃一顿丰盛,把烟火气存足了,再往上走进苍茫。'},
+          {t:'做一次认真的补给',d:'高原不相信侥幸。水、干粮、防晒、厚外套——把该带的都带上,是对辽阔最起码的尊重。'},
+          {t:'记住此刻的海拔,作为一个基准',d:'从这里开始,数字会一点点变大,城声会一点点退去。等只剩下风的时候,你会想起这个平静的起点。'}],
         booking:[bk('喀什市区酒店','¥380/晚')]},
       {id:'baishahu',nm:'白沙湖',en:'Baisha Lake',icon:'🏔',type:'sight',day:'DAY 2',lng:75.35,lat:38.72,lblDir:'top',
+        img:'baishahu.jpg',
         note:'白沙山下的一汪浅蓝。风起时,白沙簌簌落进湖里,像天在轻轻抖落什么。',
         quote:'白沙从山上簌簌落进湖里。天很近,近得像随时会俯下身来对你说话。',
         plan:'湖畔停留 · 白沙山远眺',dur:'半日',
+        worth:[
+          {t:'看白沙山与浅蓝湖水,如何互相映照',d:'白色的沙山倒扣在湖里,蓝得发浅的水温柔地接住它。这是高原路上第一处让你忍不住停车的地方。'},
+          {t:'在风起时,听白沙簌簌落进湖里',d:'那是一种极轻的声音,像天在抖落什么。站定,闭眼,让海拔和风一起替你清空脑子。'},
+          {t:'抬头,感受"天很近"是什么滋味',d:'在这个高度,云低得像随时会俯下身。你会第一次真切地觉得:天,原来是可以对话的。'}],
         booking:[bk('盖孜河谷包车途经','—')]},
       {id:'karakul',nm:'卡拉库里湖',en:'Karakul Lake',icon:'🏔',type:'sight',day:'DAY 3',lng:75.05,lat:38.43,lblDir:'left',
+        img:'karakul.jpg',
         note:'帕米尔高原上的黑海子。慕士塔格峰压在湖背后,风一停,天地就静成一面镜。',
         quote:'风一停,天地静成一面镜。这里适合什么都不做,只是看——看到自己也静下来。',
         plan:'雪山湖凝视 · 柯尔克孜毡房午茶',dur:'1 日',
+        worth:[
+          {t:'等一次无风的时刻,看天地静成镜面',d:'风一停,慕士塔格峰就落进湖里,分不清哪个是真、哪个是倒影。这一刻值得你守候整个下午。'},
+          {t:'什么都不做,只是坐着看',d:'这里没有网红打卡的必要动作。让凝视本身成为目的——看着看着,你会发现连自己也一起静了下来。'},
+          {t:'进一顶柯尔克孜毡房,喝一碗奶茶',d:'高原人待客的热,和窗外的冷是一对温柔的反差。一碗奶茶下肚,辽阔忽然就有了人情味。'},
+          {t:'留到黄昏,看雪山被落日点燃',d:'白天冷峻的雪峰,会在日落时分染上一层金红。那是崇高卸下盔甲、露出温柔的短短几分钟。'}],
         booking:[bk('包车(喀什往返)','¥600/日'),bk('湖边毡房民宿','¥260/晚')]},
       {id:'muztagh',nm:'慕士塔格峰',en:'Muztagh Ata',icon:'⛰',type:'sight',day:'DAY 4',lng:75.11,lat:38.28,lblDir:'right',
+        img:'muztagh.jpg',
         note:'冰山之父,7509 米。它不需要你征服,只需要你抬头,然后长久地沉默。',
         quote:'冰山之父不要你征服,只要你抬头。在它面前,沉默是唯一体面的回答。',
         plan:'冰川远观 · 高原星空',dur:'半日',
+        worth:[
+          {t:'抬头,与"冰山之父"对视一次',d:'7509 米的雪峰不需要你征服,只需要你抬头。在它面前,任何言语都显得多余——沉默,是唯一体面的回答。'},
+          {t:'看它的冰川,从山顶一路铺到眼前',d:'那是几万年不化的白。你会忽然懂得:有些辽阔,是时间用寒冷一寸寸垒起来的。'},
+          {t:'留到夜里,让高原星空压满头顶',d:'远离人烟与灯火,银河会浓稠得不真实。冰峰在黑暗里泛着微光,而你站在群星脚下,小得刚刚好。'}],
         booking:[bk('苏巴什营地','¥300/晚')]},
       {id:'tashkurgan',nm:'塔什库尔干',en:'Tashkurgan',icon:'🏯',type:'culture',day:'DAY 5',lng:75.23,lat:37.77,lblDir:'top',
+        img:'tashkurgan.jpg',
         note:'石头城遗址与金草滩。落日把残垣染成琥珀色,塔吉克族的鹰笛在风里若有若无。',
         quote:'落日给残垣镀上琥珀色。鹰笛若有若无,像一段没写完的句子,留白给你。',
         plan:'石头城 · 金草滩湿地 · 鹰舞',dur:'1 日',
+        worth:[
+          {t:'在落日里,登一次石头城遗址',d:'两千年的残垣被夕阳镀成琥珀色。丝路的商队早已散尽,只剩风,替它们把故事一遍遍讲给你听。'},
+          {t:'走进金草滩湿地,看雪山倒映在水草间',d:'金黄的草、蜿蜒的溪、远处的雪峰……这里是高原难得的柔软,像大地在苍茫之间留的一块温柔的余白。'},
+          {t:'听一段塔吉克族的鹰笛',d:'鹰骨做的笛,声音清冽如高原的风。它若有若无地飘着,像一段没写完的句子——余下的,留白给你。'},
+          {t:'以塔县,给这条崇高之路画上句点',d:'从喀什的烟火,到雪山的沉默,再回到人间的鹰笛与炊烟。你会明白:崇高的尽头,依然是有人认真生活的地方。'}],
         booking:[bk('塔县住宿(高原)','¥340/晚'),bk('石头城门票','¥30')]},
     ],
     route:['kashgar','baishahu','karakul','muztagh','tashkurgan'],
@@ -1082,34 +1161,66 @@ const ROUTES=[
     optional:['hemu','sayram'],  // 可裁:禾木(与喀纳斯相邻)、赛里木湖(偏西绕路);天池/那拉提/喀纳斯为骨架
     pins:[
       {id:'urumqi',nm:'乌鲁木齐',en:'Ürümqi',icon:'🛬',type:'transit',day:'DAY 1',lng:87.62,lat:43.83,lblDir:'right',
+        img:'urumqi.jpg',
         note:'天山北麓的门户。抵达当晚,先在国际大巴扎听一段热瓦普,让耳朵先到新疆。',
         quote:'一座城的第一印象,往往不在眼睛,而在耳朵——让热瓦普替你完成入境。',
         plan:'落地 · 大巴扎夜色 · 手抓饭',dur:'停留半日',
+        worth:[
+          {t:'到国际大巴扎,让耳朵先"入境"新疆',d:'还没看见草原和雪山,先让一段热瓦普的琴声落进耳朵。一座城的第一印象,往往是听见的,不是看见的。'},
+          {t:'吃一顿地道的手抓饭与烤肉',d:'黄澄澄的抓饭、滋滋作响的烤肉——用一顿丰盛的晚餐,给即将开始的长途,存下第一份关于新疆的味觉记忆。'},
+          {t:'在灯火里,给自己一个"到了"的仪式感',d:'白天赶路的疲惫,在大巴扎的夜色里慢慢化开。明天就要奔向雪峰与湖泊,今晚,先好好落地。'}],
         booking:[bk('携程/飞猪 机票比价','机票 ¥1200+','https://flights.ctrip.com'),bk('大巴扎周边酒店','¥380/晚','https://hotels.ctrip.com')]},
       {id:'tianchi',nm:'天山天池',en:'Tianchi Lake',icon:'🏔',type:'sight',day:'DAY 2',lng:88.12,lat:43.88,lblDir:'top',
+        img:'tianchi.jpg',
         note:'雪峰倒映的高山湖。清晨云未散时的湖面,是崇高与优美的交界——辽阔却不凛冽。',
         quote:'雪峰在水里生出第二座雪峰。辽阔被一汪静水驯服成温柔,只在清晨那半小时。',
         plan:'环湖步道 · 博格达峰远眺',dur:'1 日',
+        worth:[
+          {t:'赶一次清晨,看雪峰在水里生出倒影',d:'趁云未散、人未多的那半小时,博格达峰会在湖面上长出第二座雪峰。辽阔被静水驯服成温柔,只此一刻。'},
+          {t:'沿环湖步道,慢慢走一圈',d:'不必赶。让云杉、雪线和碧水轮流出现在你眼前——这条路的重点不是终点,是每一步的呼吸。'},
+          {t:'远眺博格达峰,认一认天山的骨架',d:'5445 米的主峰终年积雪。它是这一整条北疆之路的地理坐标,也是你此行第一次与天山正面相望。'}],
         booking:[bk('官网门票预约','¥190(含区间车)','http://www.xjtianchi.com')]},
       {id:'sayram',nm:'赛里木湖',en:'Sayram Lake',icon:'💧',type:'sight',day:'DAY 3',lng:81.20,lat:44.60,lblDir:'top',
+        img:'sayram.jpg',
         note:'大西洋最后一滴眼泪。湖水蓝到不真实,岸边野花一直铺到雪山脚下。',
         quote:'湖蓝到不像真的,野花一直铺到雪山脚。有些美,你只能承认自己形容不出。',
         plan:'环湖自驾 · 花海草甸',dur:'1 日',
+        worth:[
+          {t:'环湖自驾一圈,看蓝色如何变换深浅',d:'"大西洋的最后一滴眼泪"名不虚传。随着光和角度,湖水从孔雀蓝到宝石蓝一路流转——蓝到你会怀疑自己的眼睛。'},
+          {t:'在花海草甸里,把车停下来走一走',d:'夏天的岸边,野花一直铺到雪山脚下。这里的美不需要你懂,只需要你走进去,承认自己形容不出。'},
+          {t:'找一处无人的湖岸,坐着发一会儿呆',d:'风、水、雪山、花——四样东西就够了。有些辽阔,是用来浪费时间的,而不是用来打卡的。'}],
         booking:[bk('湖边毡房/木屋','¥320/晚'),bk('景区门票','¥70')]},
       {id:'nalati',nm:'那拉提',en:'Nalati Grassland',icon:'🐎',type:'sight',day:'DAY 4',lng:84.02,lat:43.32,lblDir:'right',
+        img:'nalati.jpg',
         note:'空中草原。马蹄踏过处,草浪一层追一层,哈萨克牧人的毡房像撒落的白棋子。',
         quote:'草浪一层追一层,毡房是撒落的白棋子。这里的辽阔是温的,会拥抱你,不逼视你。',
         plan:'空中草原 · 骑马 · 牧家午餐',dur:'1.5 日',
+        worth:[
+          {t:'骑一次马,让草浪从蹄下一层层追开',d:'在"空中草原"上纵马,风把草香灌满胸口。这里的辽阔是温的——它会拥抱你,而不是逼视你。'},
+          {t:'在哈萨克牧民家,吃一顿真正的牧家饭',d:'手抓肉、奶疙瘩、马奶酒。撒落如白棋子的毡房里,藏着草原最朴素也最丰盛的待客之道。'},
+          {t:'登高看一次"空中草原"的全景',d:'绿色的草甸一层叠一层,一直漫到雪线。你会明白这名字的由来:草原,原来是可以长在半空里的。'}],
         booking:[bk('那拉提草原门票','¥95'),bk('牧家乐住宿','¥280/晚')]},
       {id:'kanas',nm:'喀纳斯',en:'Kanas Lake',icon:'🏞',type:'sight',day:'DAY 5',lng:87.03,lat:48.70,lblDir:'top',
+        img:'kanas.jpg',
         note:'神的后花园。晨雾在湖面上流动,变色的湖水藏着关于湖怪的老传说。',
         quote:'晨雾在湖面上流,湖水一天变几种颜色。神把最舍不得的一笔,留在了这里。',
         plan:'观鱼台 · 三湾徒步 · 图瓦村落',dur:'2 日',
+        worth:[
+          {t:'登观鱼台,俯瞰会变色的湖水',d:'从高处看下去,湖水一天里能变换好几种颜色。神把最舍不得的那一笔,悄悄留在了这个后花园里。'},
+          {t:'徒步卧龙湾、月亮湾、神仙湾',d:'三湾各有各的静。晨雾在水面上流动,森林在水里投下倒影——每一步都像走进一幅还没干透的画。'},
+          {t:'走进图瓦人的村落,听一段古老传说',d:'湖怪、迁徙、萨满的鼓……木屋里的图瓦人守着这片山水,也守着一些比湖水更古老的秘密。'},
+          {t:'留一个清晨,专门等晨雾漫过湖面',d:'太阳升起前的那阵雾,是喀纳斯最神性的时刻。早起一次,你会得到一个几乎不像人间的湖。'}],
         booking:[bk('喀纳斯景区门票','¥160'),bk('图瓦人木屋','¥420/晚')]},
       {id:'hemu',nm:'禾木',en:'Hemu Village',icon:'🏡',type:'culture',day:'DAY 7',lng:87.75,lat:48.60,lblDir:'right',
+        img:'hemu.jpg',
         note:'炊烟里的图瓦古村。清晨薄雾从桦林升起,木屋的烟囱一根根醒来,像一幅会呼吸的画。',
         quote:'薄雾从桦林升起,烟囱一根根醒来。这是一幅会呼吸的画——你走进去,成了画里的人。',
         plan:'晨雾观景台 · 古村漫步 · 篝火',dur:'1.5 日',
+        worth:[
+          {t:'摸黑上观景台,等一场炊烟晨雾',d:'天没亮就出发,只为那半小时:薄雾从桦林升起,木屋的烟囱一根根醒来。这是一幅会呼吸的画,值得你早起去看它睁眼。'},
+          {t:'在古村的木屋巷道里,慢慢走',d:'原木的房、木栅的院、悠闲的马。这里的时间是用炊烟计量的——你走进去,不知不觉就成了画里的人。'},
+          {t:'夜里围一次篝火,看满天的星',d:'白桦林深处远离光污染,银河清晰得像触手可及。火光、星光、笑声——这是旅途最后一夜该有的样子。'},
+          {t:'以最静的一座村,给北疆之路收尾',d:'走过雪峰、湖泊与草原,最后落进一缕炊烟里。原来一路追的辽阔,最终都是为了让你更珍惜这样安稳的一天。'}],
         booking:[bk('禾木木屋民宿','¥460/晚'),bk('观景台早雾团','¥60')]},
     ],
     route:['urumqi','tianchi','sayram','nalati','kanas','hemu'],
@@ -1143,29 +1254,55 @@ const ROUTES=[
     optional:['minfeng','luntai'],  // 可裁:民丰(半日中转)、轮台胡杨(1日);沙漠公路/腹地为骨架不裁
     pins:[
       {id:'kuqa',nm:'库车',en:'Kucha',icon:'🏜',type:'culture',day:'DAY 1',lng:82.96,lat:41.72,lblDir:'right',
+        img:'kuqa.jpg',
         note:'龟兹故地,大峡谷的红色门户。老城的巴扎还留着丝路驿站的旧梦。',
         quote:'龟兹的旧梦还压在老城的巴扎里。红色峡谷在前面裂开,像大地翻开的一页。',
         plan:'天山神秘大峡谷 · 库车老城 · 龟兹壁画',dur:'1.5 日',
+        worth:[
+          {t:'走进天山神秘大峡谷,看大地裂开一页',d:'红褐色的岩壁被风与水切成千奇百怪的形状。走在窄窄的谷底,像翻进了大地内部的一页——渺小而震撼。'},
+          {t:'看一次龟兹壁画,认一段被沙掩埋的文明',d:'克孜尔的洞窟里,千年的飞天仍在墙上飘。龟兹曾是丝路上的音乐之都,如今旧梦只压在斑驳的颜料里。'},
+          {t:'在库车老城的巴扎,喝一碗药茶',d:'老城的节奏还留着丝路驿站的慵懒。找一家老茶馆坐下,让一碗热茶替你把沙漠前的心,先安顿好。'}],
         booking:[bk('库车市区酒店','¥260/晚'),bk('大峡谷门票','¥45')]},
       {id:'luntai',nm:'轮台胡杨林',en:'Luntai Poplar Forest',icon:'🍂',type:'sight',day:'DAY 2',lng:84.25,lat:41.78,lblDir:'top',
+        img:'luntai.jpg',
         note:'三千年不死的胡杨。秋来一片金,活着一千年、死了一千年、倒下又一千年。',
         quote:'胡杨活一千年、死一千年、倒下又一千年。金色是它跟时间较劲的颜色。',
         plan:'胡杨林栈道 · 塔里木河畔',dur:'1 日',
+        worth:[
+          {t:'秋天来,看一整片胡杨烧成金色',d:'"活一千年、死一千年、倒下又一千年"——金色是胡杨跟时间较劲的颜色。九、十月的这片林子,是新疆最壮烈的秋。'},
+          {t:'沿栈道深入,看老树扭曲的姿态',d:'每一棵胡杨都像一个不肯认输的手势。它们在盐碱与干旱里活成雕塑,教你什么叫"倒下也要倒得有骨气"。'},
+          {t:'走到塔里木河畔,看沙漠与生命的边界',d:'一边是奔涌的河,一边是无尽的沙。胡杨就长在这条生死线上——这是整条沙漠之路上,生命最倔强的注脚。'}],
         booking:[bk('胡杨林景区门票','¥50'),bk('轮台县城住宿','¥200/晚')]},
       {id:'desertroad',nm:'沙漠公路',en:'Desert Highway',icon:'🛣',type:'transit',day:'DAY 3',lng:84.10,lat:39.60,lblDir:'right',
+        img:'desertroad.jpg',
         note:'纵贯死亡之海的一条线。两侧是无尽的沙,芦苇草方格是人类留下的倔强。',
         quote:'一条线纵贯死亡之海。两侧只有沙,和人类倔强种下的一格格绿——渺小却不肯认输。',
         plan:'穿越塔中 · 防沙草方格 · 无人区',dur:'1 日',
+        worth:[
+          {t:'亲历一条笔直穿过"死亡之海"的路',d:'公路像一支笔,在无尽的黄沙里画出一道倔强的直线。坐在车里向两侧望——你正在穿过地球上最不欢迎人类的地方之一。'},
+          {t:'看一格格草方格,如何锁住流沙',d:'路两侧的芦苇被扎成一格格方阵,替公路挡住移动的沙丘。那是渺小的人类,种在死亡之海里的一点点绿色的固执。'},
+          {t:'在无人区里,体会真正的"什么都没有"',d:'没有信号、没有村庄、没有尽头。这种彻底的空,反而让人踏实——你会第一次听见,自己心跳的声音。'}],
         booking:[bk('塔中驿站补给','—')]},
       {id:'taklamakan',nm:'塔克拉玛干腹地',en:'Taklamakan Heart',icon:'🏜',type:'sight',day:'DAY 4',lng:83.60,lat:38.90,lblDir:'top',
+        img:'taklamakan.jpg',
         note:'进得去出不来的死亡之海。沙脊在黄昏里是流动的金,人小得像一粒被写进书里的字。',
         quote:'沙脊在黄昏里是流动的金。人小得像一粒被风写进书里的字——这就是崇高的滋味。',
         plan:'落日沙脊 · 星空营地 · 沙海静默',dur:'1 日',
+        worth:[
+          {t:'爬上一道沙脊,看黄昏把沙海点成流金',d:'夕阳斜照,沙脊的曲线像凝固的波浪,一半金、一半影。人站在脊上小得像一粒字——这就是崇高的滋味。'},
+          {t:'夜宿沙漠营地,让星空压满整片沙海',d:'白天灼热的沙,夜里凉得干净。没有一丝灯火,银河浓稠地垂下来——你会久久说不出话,只想仰头看着。'},
+          {t:'在沙海中央,静默地坐上十分钟',d:'没有风声,没有人声,连时间都仿佛停了。这种彻底的静,是死亡之海送给闯入者的、最奢侈的礼物。'},
+          {t:'让沙漠把你"写小",再把你放大',d:'在这里你渺小得像一粒沙。可当你独自穿过它、看过它的日落与星空,你的心,反而会被撑得很大很大。'}],
         booking:[bk('沙漠营地(野奢)','¥880/晚'),bk('沙漠越野体验','¥500/人')]},
       {id:'minfeng',nm:'民丰',en:'Minfeng',icon:'🌵',type:'transit',day:'DAY 5',lng:82.68,lat:37.06,lblDir:'right',
+        img:'minfeng.jpg',
         note:'沙漠南缘的绿洲小城,尼雅遗址的门口。出了沙海,第一口绿都显得格外珍贵。',
         quote:'出了沙海,第一口绿都格外珍贵。尼雅在沙下沉睡,提醒你:辉煌也会被风收走。',
         plan:'尼雅遗址远望 · 绿洲整备',dur:'半日',
+        worth:[
+          {t:'出沙海后,珍惜第一口绿洲的绿',d:'穿过死亡之海再看见胡杨与农田,你会对"绿色"生出前所未有的感激。这一口绿,是沙漠替你重新校准过的珍贵。'},
+          {t:'向尼雅遗址的方向,遥望一眼',d:'"东方庞贝"尼雅就沉睡在附近的沙下。曾经繁华的精绝古国被风沙收走——它在提醒你:再盛大的辉煌,也敌不过时间。'},
+          {t:'给整条苍茫之路,画一个安稳的句点',d:'从库车的旧梦,到沙海的星空,最后落回一座绿洲小城。你带走的不只是照片,还有一颗被辽阔重新丈量过的心。'}],
         booking:[bk('民丰县城酒店','¥180/晚')]},
     ],
     route:['kuqa','luntai','desertroad','taklamakan','minfeng'],
@@ -1612,7 +1749,22 @@ function drawPins(){
 function openCard(id){
   const p=PINS.find(x=>x.id===id);
   const arrived=state.arrived[id],planned=state.planned[id];
-  const bkHTML=p.booking.map(b=>`<a href="${b.url}" target="_blank">${b.ch}<span class="price">${b.price}</span></a>`).join('');
+  // 顶部配图:有 img 用真实照片,失败/缺省用按类型着色的氛围渐变兜底
+  const photoHTML = p.img
+    ? `<div class="card-photo"><img src="images/${p.img}" alt="${p.nm}" loading="lazy"
+         onerror="this.parentNode.classList.add('placeholder','ph-${p.type}');this.remove();">
+         <div class="photo-cap">${p.icon} ${p.nm}</div></div>`
+    : `<div class="card-photo placeholder ph-${p.type}"><div class="ph-emoji">${p.icon}</div>
+         <div class="photo-cap">${p.nm}</div></div>`;
+  // 「这个地点,值得——」手风琴(可多开)
+  const worth = p.worth || [];
+  const worthHTML = worth.map((w,i)=>`
+    <div class="worth-item" data-wi="${i}">
+      <button class="worth-t" type="button">
+        <span class="worth-tx">${w.t}</span><span class="worth-cv">⌄</span>
+      </button>
+      <div class="worth-d"><p>${w.d}</p></div>
+    </div>`).join('');
   document.getElementById('card').innerHTML=`
     <div class="hd">
       <button class="close" onclick="closeCard()">✕</button>
@@ -1620,15 +1772,26 @@ function openCard(id){
       <div class="nm">${p.nm}</div><div class="en">${p.en}</div>
     </div>
     <div class="bd">
+      ${photoHTML}
       <div class="sec"><h4>本页安排 <span class="meta">${p.plan}</span></h4><p>${p.note}</p></div>
       <div class="sec"><h4>专家的话</h4><div class="note">&ldquo;${p.quote}&rdquo;</div></div>
-      <div class="sec booking"><h4>预订清单 <span class="meta">自行下单</span></h4>${bkHTML}</div>
+      ${worth.length?`<div class="sec worth"><h4>这个地点,值得—— <span class="meta">点开展开</span></h4>
+        <div class="worth-list">${worthHTML}</div></div>`:''}
     </div>
     ${arrived?`<div class="stampts">✦ 已于 ${arrived} 到达此地</div>`:''}
     <div class="actions">
       <button class="gold" id="btnGo" ${arrived?'disabled':''}>${arrived?'★ 已抵达':'去这里 →'}</button>
     </div>`;
   document.getElementById('btnGo').onclick=()=>{markArrive(id)};
+  // 手风琴:点击标题切换展开(多开),max-height 过渡
+  document.querySelectorAll('#card .worth-item .worth-t').forEach(btn=>{
+    btn.onclick=()=>{
+      const item=btn.closest('.worth-item');
+      const d=item.querySelector('.worth-d');
+      const open=item.classList.toggle('open');
+      d.style.maxHeight = open ? (d.scrollHeight+'px') : '0px';
+    };
+  });
   document.getElementById('cardMask').classList.add('on');
 }
 function closeCard(){document.getElementById('cardMask').classList.remove('on')}
@@ -1650,7 +1813,7 @@ function markArrive(id){
     arrivalRitual(id);
     checkBadges();
     setTimeout(()=>revealStory(id),350);
-    if(ROUTE.every(x=>state.arrived[x]))setTimeout(showCongrats,2200);
+    if(ROUTE.every(x=>state.arrived[x]))setTimeout(()=>replay({then:showCongrats}),1400);
   });
 }
 // A4 到达仪式:纸面微震 + 淡金涟漪 + 盖章脉冲 + 墨晕 + 一声清脆
@@ -1699,12 +1862,14 @@ function renderBadges(){
 
 /* ---------- 足迹回放 B3:电影式重走 ---------- */
 let _replaying=false;
-function replay(){
+let _replayThen=null;   // 回放结束后的回调(自动流程用:接合章书页)
+function replay(opts){
   if(_replaying)return;
   const seq=ROUTE.filter(id=>state.arrived[id]);
   if(!seq.length){replayFlash('还没有足迹','走过一站后,再来回看这段路','no journey yet');
     setTimeout(hideReplayFlash,1600);return;}
   _replaying=true;
+  _replayThen=(opts&&typeof opts.then==='function')?opts.then:null;
   const stage=document.getElementById('stage');
   const realHere=state.here;
   stage.classList.add('replaying');
@@ -1751,6 +1916,9 @@ function finishReplay(realHere){
   _replaying=false;
   document.getElementById('stage').classList.remove('replaying');
   refresh();
+  // 自动流程:回放播完 → 稍候接合章书页
+  const cb=_replayThen; _replayThen=null;
+  if(cb)setTimeout(cb,900);
 }
 // 快闪一张信笺缩影(复用 pin 文案),1.1s 自动淡出
 function flashStation(id){
