@@ -396,41 +396,37 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
 .congrats{position:absolute;inset:0;z-index:90;background:rgba(42,58,92,.92);display:none;flex-direction:column;
   align-items:center;justify-content:center;color:var(--paper);text-align:center}
 .congrats.on{display:flex}
-/* 十秒水彩画电影 */
-.film{position:absolute;inset:0;z-index:2;overflow:hidden;background:#0d1220;display:none}
+/* 十秒手绘剪影长卷电影(Father-and-Son 质感) */
+.film{position:absolute;inset:0;z-index:2;overflow:hidden;display:none;
+  background:linear-gradient(105deg,#EADFC4 0%,#E6C89A 32%,#B7A79C 58%,#7E8098 80%,#4A5476 100%)}
 .congrats.filming .film{display:block}
 .congrats.filming .stamp-card,.congrats.filming #congratsActions{display:none}
-.film-stage{position:absolute;inset:0}
-.film-frame{position:absolute;inset:0;opacity:0;background-size:cover;background-position:center;
-  will-change:transform,opacity;filter:saturate(1.28) contrast(.86) brightness(1.05)}
-/* 水彩铺色:纸纹叠色相乘,让照片像被水彩笔晕染过 */
-.film-frame::before{content:"";position:absolute;inset:0;mix-blend-mode:soft-light;opacity:.72;
-  background:
-    radial-gradient(60% 45% at 30% 25%,rgba(199,154,75,.6),transparent 70%),
-    radial-gradient(55% 50% at 75% 70%,rgba(197,90,74,.5),transparent 72%),
-    radial-gradient(70% 60% at 50% 100%,rgba(42,58,92,.6),transparent 70%),
-    radial-gradient(50% 40% at 80% 15%,rgba(120,150,120,.5),transparent 70%)}
-/* 纸张水彩纹理:斑驳留白 + 湿边沉积,营造宣纸晕染 */
-.film-frame::after{content:"";position:absolute;inset:0;mix-blend-mode:overlay;opacity:.5;
-  background:
-    radial-gradient(140px 100px at 18% 28%,rgba(255,255,255,.75),transparent 60%),
-    radial-gradient(180px 130px at 68% 58%,rgba(255,255,255,.6),transparent 62%),
-    radial-gradient(110px 80px at 45% 82%,rgba(0,0,0,.28),transparent 60%),
-    radial-gradient(90px 70px at 88% 30%,rgba(255,255,255,.55),transparent 60%),
-    repeating-linear-gradient(58deg,rgba(0,0,0,.05) 0 2px,transparent 2px 6px)}
-.film-frame.show{opacity:1}
-.film-wc{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.film-grain{position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
-  background-image:radial-gradient(rgba(255,255,255,.16) 1px,transparent 1px);background-size:3px 3px}
-.film-cap{position:absolute;left:0;right:0;bottom:11%;text-align:center;color:var(--paper);
-  font-family:var(--f-serif);font-size:27px;letter-spacing:5px;font-weight:600;
-  opacity:0;transform:translateY(14px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.16,1,.3,1);padding:0 8%}
-.film-cap span{display:inline-block;padding:9px 26px;background:rgba(13,18,32,.42);
+/* 太阳:柔光大圆 + 外晕 */
+.film-sun{position:absolute;left:30%;top:24%;width:120px;height:120px;border-radius:50%;z-index:1;
+  background:radial-gradient(circle,#FCF3DC 0%,#FBEFD2 42%,rgba(247,231,198,.5) 62%,rgba(247,231,198,0) 100%);
+  transform:translate(-50%,-50%)}
+.film-sun::after{content:"";position:absolute;left:50%;top:50%;width:280px;height:280px;transform:translate(-50%,-50%);
+  border-radius:50%;background:radial-gradient(circle,rgba(251,239,210,.55) 0%,rgba(247,231,198,0) 70%)}
+.film-stage{position:absolute;inset:0;z-index:2}
+/* 视差分层:各层横移速度不同 */
+.film-layer{position:absolute;inset:0;height:100%;width:100%}
+.film-layer svg{display:block;height:100%;width:100%}
+.filming .film-L{animation-timing-function:linear;animation-fill-mode:forwards}
+@keyframes filmPanFar{to{transform:translateX(-12%)}}
+@keyframes filmPanMid{to{transform:translateX(-20%)}}
+@keyframes filmPanNear{to{transform:translateX(-30%)}}
+.film-grain{position:absolute;inset:0;z-index:3;pointer-events:none;mix-blend-mode:multiply;opacity:.36;width:100%;height:100%}
+.film-vig{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(78% 70% at 50% 44%,transparent 56%,rgba(13,18,32,.46) 100%)}
+.film-cap{position:absolute;left:0;right:0;bottom:13%;text-align:center;color:var(--paper);z-index:4;
+  font-family:var(--f-serif);font-size:30px;letter-spacing:6px;font-weight:600;
+  opacity:0;transform:translateY(14px);transition:opacity 1s ease,transform 1s cubic-bezier(.16,1,.3,1);padding:0 8%}
+.film-cap span{display:inline-block;padding:10px 30px;background:rgba(13,18,32,.28);
   backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border-radius:3px;
-  box-shadow:0 4px 24px rgba(13,18,32,.5);text-shadow:0 1px 8px rgba(13,18,32,.9)}
+  text-shadow:0 1px 10px rgba(13,18,32,.9)}
 .film-cap.show{opacity:1;transform:translateY(0)}
 .film-skip{position:absolute;right:22px;bottom:20px;padding:7px 15px;font-family:var(--f-sans);font-size:12px;
-  letter-spacing:2px;color:rgba(247,241,227,.7);background:rgba(13,18,32,.35);border:1px solid rgba(247,241,227,.28);
+  letter-spacing:2px;color:rgba(247,241,227,.75);background:rgba(13,18,32,.35);border:1px solid rgba(247,241,227,.32);
   border-radius:20px;cursor:pointer;transition:.2s;z-index:5}
 .film-skip:hover{color:var(--paper);border-color:var(--paper);background:rgba(13,18,32,.6)}
 /* B4 合章书页:竖版藏书票/邮票(电影落幕后) */
@@ -524,21 +520,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
     </div>
 
     <div class="congrats" id="congrats">
-      <!-- 十秒水彩画电影:景点幻灯 + 水彩晕染遮罩 + 逐句签名 -->
+      <!-- 十秒手绘剪影长卷电影(Father-and-Son 质感):分层视差山河 + 旅人 + 逐句签名 -->
       <div class="film" id="film">
+        <div class="film-sun" id="filmSun"></div>
         <div class="film-stage" id="filmStage"></div>
-        <svg class="film-wc" id="filmWC" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <filter id="wcedge"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="3" seed="7" result="n"/>
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="7"/></filter>
-            <radialGradient id="wcvig" cx="50%" cy="46%" r="72%">
-              <stop offset="0%" stop-color="#000" stop-opacity="0"/>
-              <stop offset="72%" stop-color="#000" stop-opacity="0"/>
-              <stop offset="100%" stop-color="#0d1220" stop-opacity="0.5"/></radialGradient>
-          </defs>
-          <rect x="-4" y="-4" width="108" height="108" fill="url(#wcvig)"/>
+        <svg class="film-grain" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <filter id="filmGrainF" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="8"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 .3  0 0 0 0 .26  0 0 0 0 .18  0 0 0 .5 0"/></filter>
+          <rect x="0" y="0" width="100" height="100" filter="url(#filmGrainF)"/>
         </svg>
-        <div class="film-grain"></div>
+        <div class="film-vig"></div>
         <div class="film-cap" id="filmCap"></div>
         <button class="film-skip" id="filmSkip">跳过 ⏭</button>
       </div>
@@ -2058,59 +2050,86 @@ function showCongrats(){
     chime();
   });
 }
+// 手绘剪影长卷 SVG(三层视差:远山/中景/近景)。纯 SVG,零依赖。
+function buildScrollLayers(){
+  return `
+  <div class="film-layer film-L" style="animation:filmPanFar var(--filmdur,10s) linear forwards">
+    <svg viewBox="0 0 2200 1080" preserveAspectRatio="xMinYMax slice">
+      <defs><filter id="fwc1" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="2" seed="3" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="12"/></filter></defs>
+      <g filter="url(#fwc1)" opacity="0.55">
+        <path d="M0,720 L240,520 L440,640 L700,450 L940,650 L1180,480 L1440,660 L1700,470 L1960,650 L2200,520 L2200,1080 L0,1080 Z" fill="#8B93AC"/>
+        <path d="M700,450 L750,516 L650,516 Z" fill="#EFE9DA"/>
+        <path d="M1180,480 L1228,542 L1132,542 Z" fill="#EFE9DA"/>
+        <path d="M1700,470 L1748,534 L1652,534 Z" fill="#EFE9DA"/>
+      </g></svg></div>
+  <div class="film-layer film-L" style="animation:filmPanMid var(--filmdur,10s) linear forwards">
+    <svg viewBox="0 0 2400 1080" preserveAspectRatio="xMinYMax slice">
+      <defs><filter id="fwc2" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.007 0.013" numOctaves="2" seed="6" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="15"/></filter></defs>
+      <g filter="url(#fwc2)">
+        <path d="M420,860 L720,320 L788,456 L880,270 L1060,580 L1200,860 Z" fill="#6C7590" opacity="0.8"/>
+        <path d="M880,270 L934,372 L826,372 Z" fill="#F2ECDD" opacity="0.9"/>
+        <path d="M720,320 L762,400 L678,400 Z" fill="#F2ECDD" opacity="0.72"/>
+        <path d="M0,880 C400,800 800,910 1200,860 C1650,806 2000,900 2400,858 L2400,1080 L0,1080 Z" fill="#5C6B54" opacity="0.85"/>
+        <path d="M1560,904 C1720,894 1900,898 2020,895 C2068,894 2090,900 2088,908 C2082,930 2040,940 1980,940 C1820,943 1680,940 1580,940 C1536,938 1520,912 1560,904 Z" fill="#78A2AB" opacity="0.82"/>
+        <rect x="1590" y="900" width="440" height="5" rx="2" fill="#E2EDE9" opacity="0.55"/>
+      </g></svg></div>
+  <div class="film-layer film-L" style="animation:filmPanNear var(--filmdur,10s) linear forwards">
+    <svg viewBox="0 0 2600 1080" preserveAspectRatio="xMinYMax slice">
+      <defs><filter id="fwc3" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.009 0.016" numOctaves="2" seed="9" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="9"/></filter></defs>
+      <g filter="url(#fwc3)">
+        <path d="M-40,1000 C400,966 900,1016 1400,992 C1800,974 2100,948 2680,972 L2680,1120 L-40,1120 Z" fill="#3C4353" opacity="0.94"/>
+        <path d="M1180,1080 C1280,1010 1420,990 1560,996 C1720,1002 1860,988 2020,976 C2260,958 2440,986 2680,972 L2680,1120 L1180,1120 Z" fill="#CFA860" opacity="0.58"/>
+        <path d="M1460,1080 C1560,1024 1700,1004 1840,1012 C2020,1022 2200,1000 2420,990 C2520,986 2600,996 2680,996 L2680,1120 L1460,1120 Z" fill="#B8893C" opacity="0.48"/>
+        <g fill="#23271E">
+          <path d="M300,998 L294,908 L276,928 L292,890 L276,862 L300,882 L308,840 L316,882 L338,860 L320,892 L338,918 L312,906 L310,998 Z"/>
+          <path d="M1980,996 L1974,920 L1958,938 L1972,906 L1958,882 L1980,900 L1986,866 L1994,900 L2014,880 L1998,908 L2014,930 L1992,920 L1990,996 Z"/>
+        </g>
+      </g>
+      <g transform="translate(880,972)" fill="#1B1F2B">
+        <ellipse cx="2" cy="30" rx="30" ry="7" fill="#000" opacity="0.2"/>
+        <circle cx="0" cy="-46" r="12"/>
+        <path d="M-10,-34 L10,-34 L15,4 L-15,4 Z"/>
+        <rect x="-13" y="2" width="9" height="31" rx="3"/><rect x="5" y="2" width="9" height="31" rx="3"/>
+        <rect x="12" y="-32" width="5" height="50" rx="2" transform="rotate(7 14 0)"/>
+      </g></svg></div>`;
+}
 function playFilm(done){
   clearFilmTimers();
   const con=document.getElementById('congrats');
   const stage=document.getElementById('filmStage');
   const cap=document.getElementById('filmCap');
   const skip=document.getElementById('filmSkip');
-  // 走过的景点(有配图的)按到达顺序
-  const shots=ROUTE.filter(id=>state.arrived[id])
-    .map(id=>PINS.find(p=>p.id===id)).filter(p=>p&&p.img);
-  if(!shots.length){ // 没有配图则跳过电影,直接书页
-    con.classList.remove('filming'); if(done)done(); return;
-  }
   con.classList.add('filming');
   _filmPlaying=true;
   chime();
-  const N=shots.length;
-  const TOTAL=10000;                       // 约 10 秒
-  const per=Math.max(1500,Math.round(TOTAL/N));
+  const TOTAL=10000;                       // 约 10 秒长卷横移
+  // 逐句签名节奏:开卷 → 山 → 湖 → 漠 → 收束
+  const lines=['山河为序','雪落帕米尔','草原与湖泊','大漠孤烟直','这一程,值得'];
+  // 重建长卷层(重置动画)
   stage.innerHTML='';
-  const frames=shots.map((p,i)=>{
-    const f=document.createElement('div');
-    f.className='film-frame';
-    f.style.backgroundImage=`url(images/${p.img})`;
-    // 交替 Ken Burns 运镜方向
-    const zoomIn=i%2===0;
-    f.style.transform=zoomIn?'scale(1.02)':'scale(1.14)';
-    f.style.transition=`opacity 1.2s ease, transform ${(per+1400)/1000}s ease-out`;
-    stage.appendChild(f);
-    return {el:f,zoomIn,pin:p};
-  });
-  const capFor=i=>{
-    // 首、中、末给旁白,其余用景点名,形成"山河为序…景点…这一程值得"的节奏
-    if(i===0) return '山河为序';
-    if(i===N-1) return '这一程,值得';
-    return shots[i].nm;
-  };
+  stage.style.setProperty('--filmdur',(TOTAL/1000)+'s');
+  stage.innerHTML=buildScrollLayers();
+  // 强制回流以确保动画从 0 开始
+  void stage.offsetWidth;
   let idx=0;
-  const showFrame=i=>{
-    frames.forEach((fr,k)=>{ if(k!==i) fr.el.classList.remove('show'); });
-    const fr=frames[i];
-    fr.el.classList.add('show');
-    // 触发运镜(下一帧位)
-    requestAnimationFrame(()=>{ fr.el.style.transform=fr.zoomIn?'scale(1.16)':'scale(1.0)'; });
+  const per=Math.round(TOTAL/lines.length);
+  const showCap=i=>{
     cap.classList.remove('show');
     _filmTimers.push(setTimeout(()=>{
-      cap.innerHTML='<span>'+capFor(i).replace(/[<>&]/g,'')+'</span>';
+      cap.innerHTML='<span>'+lines[i].replace(/[<>&]/g,'')+'</span>';
       cap.classList.add('show');
     },260));
   };
   const step=()=>{
     if(!_filmPlaying) return;
-    if(idx>=N){ endFilm(done); return; }
-    showFrame(idx);
+    if(idx>=lines.length){ endFilm(done); return; }
+    showCap(idx);
     idx++;
     _filmTimers.push(setTimeout(step,per));
   };
@@ -2123,8 +2142,9 @@ function endFilm(done){
   const con=document.getElementById('congrats');
   const cap=document.getElementById('filmCap');
   cap.classList.remove('show');
-  // 末帧淡出 → 揭示书页
+  // 淡出长卷 → 揭示合章书页
   con.classList.remove('filming');
+  const stage=document.getElementById('filmStage'); if(stage)stage.innerHTML='';
   if(done)done();
 }
 function clearFilmTimers(){_filmTimers.forEach(t=>clearTimeout(t));_filmTimers=[];}
@@ -2132,6 +2152,7 @@ function closeCongrats(){
   clearFilmTimers();_filmPlaying=false;
   const con=document.getElementById('congrats');
   con.classList.remove('on');con.classList.remove('filming');
+  const stage=document.getElementById('filmStage'); if(stage)stage.innerHTML='';
 }
 // 保存:优先 PNG(离屏 canvas);失败兜底 SVG 下载
 function downloadStamp(){
