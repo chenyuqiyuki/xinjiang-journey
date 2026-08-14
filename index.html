@@ -454,6 +454,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#E4D5C6;font-family:
   background:var(--paper);color:var(--navy);cursor:pointer;box-shadow:2px 2px 0 var(--navy);transition:.2s}
 .footbar button:hover{background:var(--navy);color:var(--paper)}
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2A3A5C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="漫游地图">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 <body>
 
@@ -2350,6 +2357,13 @@ window.addEventListener('orientationchange',()=>setTimeout(scaleStage,120));
     renderQuestion();
   }
 })();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
